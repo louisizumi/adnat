@@ -5,7 +5,7 @@ class User < ApplicationRecord
          :recoverable, :rememberable, :validatable
 
   has_many :shifts
-  belongs_to :organisation
+  belongs_to :organisation, optional: true
 
-  validates :full_name, presence: true, format: { with: /\A([a-z]+[ \-.,']* )+\z/i }
+  validates :full_name, presence: true, format: { with: /\A([a-z]+[ \-.,']*)+\z/i }
 end
