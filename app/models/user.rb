@@ -7,5 +7,5 @@ class User < ApplicationRecord
   has_many :shifts
   belongs_to :organisation, optional: true
 
-  validates :full_name, presence: true, format: { with: /\A([a-z]+[ \-.,']*)+\z/i }
+  validates :full_name, format: { with: /\A([a-z]+[ \-.,']*)+\z/i }, length: { in: 2..64 }, presence: true
 end
