@@ -8,7 +8,7 @@ class ShiftsController < ApplicationController
   def create
     @shift = Shift.new(shift_params)
     @shift.user = current_user
-    if @shift.save!
+    if @shift.save
       redirect_to shifts_path, notice: 'Shift was successfully created'
     else
       render :index
