@@ -13,3 +13,25 @@
  *= require_tree .
  *= require_self
  */
+
+@import '../components/index';
+
+* {
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  width: 100vw;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+main {
+  width: 100vw;
+}
+
+.container {
+  margin: 0 20vw;
+  width: 100%;
+}
