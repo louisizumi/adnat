@@ -1,0 +1,23 @@
+.flex--main {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vw;
+
+  main {
+    flex: 1;
+  }
+}
+
+.flex--space-between {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.flex--start-ver {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}

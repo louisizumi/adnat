@@ -11,7 +11,14 @@
   </head>
 
   <body>
-    <%= yield %>
+    <div class="flex--main">
+      <%= render "shared/navbar" %>
+      <main class="flex--start-ver">
+        <div class="container">
+          <%= yield %>
+        </div>
+      </main>
+    </div>
     <% console %>
   </body>
 </html>
