@@ -2,5 +2,5 @@ Rails.application.routes.draw do
   # For details on the DSL available within this file, see https://guides.rubyonrails.org/routing.html
   root to: "organisations#index"
   devise_for :users
-  resources :organisations, only: %i[index show create edit update destroy]
+  resources :organisations, except: %i[new]
 end
