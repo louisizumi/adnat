@@ -1,5 +1,5 @@
 class OrganisationsController < ApplicationController
-  before_action :find_console, only: %i[show edit update destroy]
+  before_action :find_console, only: %i[edit update destroy]
 
   def index
     @organisations = Organisation.all
