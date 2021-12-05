@@ -4,6 +4,7 @@
   <tbody>
     <tr>
       <th>Employee Name</th>
+      <th>Start Date</th>
       <th>Start Time</th>
       <th>Finish Time</th>
       <th>Break Length (minutes)</th>
@@ -13,19 +14,21 @@
     <% @shifts.each do |shift| %>
       <tr>
         <td><%= shift.user.full_name %></td>
-        <td><%= shift.start.strftime("%d/%m/%Y %I:%M%P") %></td>
-        <td><%= shift.finish.strftime("%d/%m/%Y %I:%M%P") %></td>
+        <td><%= shift.start.strftime("%d/%m/%Y")%>
+        <td><%= shift.start.strftime("%H:%M") %></td>
+        <td><%= shift.finish.strftime("%H:%M") %></td>
         <td><%= shift.break %></td>
         <% @hours = (shift.finish - shift.start - (shift.break * 60)) / 3600 %>
         <td><%= @hours %></td>
-        <td><%= @hours * @organisation.hourly_rate %></td>
+        <td>£<%= @hours * @organisation.hourly_rate %></td>
       </tr>
     <% end %>
     <tr>
       <%= form_for @shift do |f| %>
       <td><%= current_user.full_name %></td>
-      <td><%= f.datetime_local_field :start %></td>
-      <td><%= f.datetime_local_field :finish %></td>
+      <td><%= f.date_field :start_date %></td>
+      <td><%= f.time_field :start_time %></td>
+      <td><%= f.time_field :finish %></td>
       <td><%= f.number_field :break, step: 1 %></td>
       <td colspan="2"><%= f.submit %></td>
       <% end %>

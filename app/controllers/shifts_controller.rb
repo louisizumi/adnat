@@ -7,6 +7,12 @@ class ShiftsController < ApplicationController
 
   def create
     @shift = Shift.new(shift_params)
+    @shift.start = DateTime.parse("#{@shift.start_date} #{@shift.start_time}")
+    if @shift.start_time > @shift.finish
+      @shift.finish = DateTime.parse("#{@shift.start_date + 1} #{@shift.finish}")
+    else
+      @shift.finish = DateTime.parse("#{@shift.start_date} #{@shift.finish}")
+    end
     @shift.user = current_user
     if @shift.save
       redirect_to shifts_path, notice: 'Shift was successfully created'
@@ -26,6 +32,6 @@ class ShiftsController < ApplicationController
   end
 
   def shift_params
-    params.require(:shift).permit(:start, :finish, :break)
+    params.require(:shift).permit(:start_date, :start_time, :finish, :break)
   end
 end
