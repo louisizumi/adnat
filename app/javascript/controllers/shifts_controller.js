@@ -1,6 +1,20 @@
 import { Controller } from "stimulus"
 
 export default class extends Controller {
+  static targets = [ "currentShifts", "previousShifts" ]
+
+  showCurrent(e) {
+    e.preventDefault();
+    this.currentShiftsTarget.style.display = "block";
+    this.previousShiftsTarget.style.display = "none";
+  }
+
+  showPrevious(e) {
+    e.preventDefault();
+    this.currentShiftsTarget.style.display = "none";
+    this.previousShiftsTarget.style.display = "block";
+  }
+
   showForm(e) {
     e.preventDefault();
     const row = this.getRow(e.target.dataset.id);
@@ -18,10 +32,10 @@ export default class extends Controller {
   }
 
   getRow(id) {
-    return document.querySelector(`[data-row-id='${id}']`);
+    return document.querySelector(`[data-rowid='${id}']`);
   }
 
   getForm(id) {
-    return document.querySelector(`[data-form-id='${id}']`);
+    return document.querySelector(`[data-formid='${id}']`);
   }
 }

@@ -1,6 +1,6 @@
 class Organisation < ApplicationRecord
   has_many :users
-  has_many :shifts, through: :users
+  has_many :shifts
 
   validates :name, :hourly_rate, presence: true
   validates :name, length: { in: 2..64 }, uniqueness: true
