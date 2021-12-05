@@ -1,53 +1,82 @@
 <h2><%= @organisation.name %></h2>
 <h3>Shifts</h3>
-<table data-controller="shifts">
-  <tbody>
-    <tr>
-      <th>Employee Name</th>
-      <th>Start Date</th>
-      <th>Start Time</th>
-      <th>Finish Time</th>
-      <th>Break Length (minutes)</th>
-      <th>Hours Worked</th>
-      <th>Shift Cost</th>
-      <th></th>
-    </tr>
-    <% @shifts.each do |shift| %>
-      <tr data-row-id="<%= shift.id %>">
-        <td><%= shift.user.full_name %></td>
-        <td><%= shift.start.strftime("%d/%m/%Y")%>
-        <td><%= shift.start.strftime("%H:%M") %></td>
-        <td><%= shift.finish.strftime("%H:%M") %></td>
-        <td><%= shift.break %></td>
+<div data-controller="shifts">
+  <p>
+    <%= link_to "Current Employees", shifts_path, data: { action: "click->shifts#showCurrent" } %>
+    <%= link_to "Previous Employees", shifts_path, data: { action: "click->shifts#showPrevious" } %>
+  </p>
+  <div class="table" data-shifts-target="currentShifts">
+    <div class="tr">
+      <div class="th">Employee Name</div>
+      <div class="th">Start Date</div>
+      <div class="th">Start Time</div>
+      <div class="th">Finish Time</div>
+      <div class="th">Break Length (minutes)</div>
+      <div class="th">Hours Worked</div>
+      <div class="th">Shift Cost</div>
+      <div class="th"></div>
+    </div>
+    <% @current_shifts.each do |shift| %>
+      <div class="tr" data-rowid="<%= shift.id %>">
+        <div class="td"><%= shift.user.full_name %></div>
+        <div class="td"><%= shift.start.strftime("%d/%m/%Y")%></div>
+        <div class="td"><%= shift.start.strftime("%H:%M") %></div>
+        <div class="td"><%= shift.finish.strftime("%H:%M") %></div>
+        <div class="td"><%= shift.break %></div>
         <% @hours = (shift.finish - shift.start - (shift.break * 60)) / 3600 %>
-        <td><%= @hours.round(2) %></td>
-        <td>£<%= (@hours * @organisation.hourly_rate).round(2) %></td>
-        <td>
+        <div class="td"><%= "%.2f" % @hours %></div>
+        <div class="td">£<%= "%.2f" % (@hours * @organisation.hourly_rate) %></div>
+        <div class="td">
           <%= link_to "Edit", shifts_path, data: { id: shift.id, action: "click->shifts#showForm" } %>
           <%= link_to "Delete", shift, method: :delete %>
-        </td>
-      </tr>
-      <tr style="display: none;" data-form-id="<%= shift.id %>">
-        <%= form_for shift do |f| %>
-        <td><%= current_user.full_name %></td>
-        <td><%= f.date_field :start_date, form: "edit_shift_#{shift.id}", value: Date.parse(shift.start.to_s) %></td>
-        <td><%= f.time_field :start_time, form: "edit_shift_#{shift.id}", value: (Time.parse(shift.start.to_s)).strftime("%T.%L") %></td>
-        <td><%= f.time_field :finish, form: "edit_shift_#{shift.id}" %></td>
-        <td><%= f.number_field :break, step: 1, form: "edit_shift_#{shift.id}" %></td>
-        <td colspan="2"><%= f.submit form: "edit_shift_#{shift.id}" %></td>
-        <td><%= link_to "Cancel", shifts_path, data: { id: shift.id, action: "click->shifts#hideForm" } %></td>
-        <% end %>        
-      </tr>
+        </div>
+      </div>
+      <%= form_for shift, html: { class: "tr", style: "display:none;", data: { formid: shift.id } } do |f| %>
+        <div class="td"><%= current_user.full_name %></div>
+        <div class="td"><%= f.date_field :start_date, form: "edit_shift_#{shift.id}", value: Date.parse(shift.start.to_s) %></div>
+        <div class="td"><%= f.time_field :start_time, form: "edit_shift_#{shift.id}", value: (Time.parse(shift.start.to_s)).strftime("%T.%L") %></div>
+        <div class="td"><%= f.time_field :finish, form: "edit_shift_#{shift.id}" %></div>
+        <div class="td"><%= f.number_field :break, step: 1, form: "edit_shift_#{shift.id}" %></div>
+        <div class="td" colspan="2"><%= f.submit form: "edit_shift_#{shift.id}" %></div>
+        <div class="td"><%= link_to "Cancel", shifts_path, data: { id: shift.id, action: "click->shifts#hideForm" } %></div>
+      <% end %>  
     <% end %>
-    <tr>
-      <%= form_for @shift do |f| %>
-      <td><%= current_user.full_name %></td>
-      <td><%= f.date_field :start_date, form: "new_shift" %></td>
-      <td><%= f.time_field :start_time, form: "new_shift" %></td>
-      <td><%= f.time_field :finish, form: "new_shift" %></td>
-      <td><%= f.number_field :break, step: 1, form: "new_shift" %></td>
-      <td colspan="3"><%= f.submit form: "new_shift" %></td>
-      <% end %>
-    </tr>
-  </tbody>
-</table>
+    <%= form_for @shift, html: { class: "tr" } do |f| %>
+      <div class="td"><%= current_user.full_name %></div>
+      <div class="td"><%= f.date_field :start_date, form: "new_shift" %></div>
+      <div class="td"><%= f.time_field :start_time, form: "new_shift" %></div>
+      <div class="td"><%= f.time_field :finish, form: "new_shift" %></div>
+      <div class="td"><%= f.number_field :break, step: 1, form: "new_shift" %></div>
+      <div class="td" colspan="3"><%= f.submit form: "new_shift" %></div>
+    <% end %>
+  </div>
+
+  <div class="table" style="display:none;" data-shifts-target="previousShifts">
+    <div class="tr">
+      <div class="th">Employee Name</div>
+      <div class="th">Start Date</div>
+      <div class="th">Start Time</div>
+      <div class="th">Finish Time</div>
+      <div class="th">Break Length (minutes)</div>
+      <div class="th">Hours Worked</div>
+      <div class="th">Shift Cost</div>
+      <div class="th"></div>
+    </div>
+    <% @previous_shifts.each do |shift| %>
+      <div class="tr" data-rowid="<%= shift.id %>">
+        <div class="td"><%= shift.user.full_name %></div>
+        <div class="td"><%= shift.start.strftime("%d/%m/%Y")%></div>
+        <div class="td"><%= shift.start.strftime("%H:%M") %></div>
+        <div class="td"><%= shift.finish.strftime("%H:%M") %></div>
+        <div class="td"><%= shift.break %></div>
+        <% @hours = (shift.finish - shift.start - (shift.break * 60)) / 3600 %>
+        <div class="td"><%= "%.2f" % @hours %></div>
+        <div class="td">£<%= "%.2f" % (@hours * @organisation.hourly_rate) %></div>
+        <div class="td">
+          <%= link_to "Edit", shifts_path, data: { id: shift.id, action: "click->shifts#showForm" } %>
+          <%= link_to "Delete", shift, method: :delete %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>

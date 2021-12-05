@@ -15,6 +15,7 @@ class ShiftsController < ApplicationController
       @shift.finish = DateTime.parse("#{@shift.start_date} #{@shift.finish}")
     end
     @shift.user = current_user
+    @shift.organisation = @organisation
     if @shift.save
       redirect_to shifts_path, notice: 'Shift was successfully created'
     else
@@ -57,7 +58,9 @@ class ShiftsController < ApplicationController
   end
 
   def get_shifts
-    @shifts = @organisation.shifts.order(start: :desc)
+    @shifts = Shift.where(organisation: @organisation).order(start: :desc)
+    @current_shifts = @shifts.select { |shift| shift.user.organisation == shift.organisation }
+    @previous_shifts = @shifts.reject { |shift| shift.user.organisation == shift.organisation }
   end
 
   def shift_params
