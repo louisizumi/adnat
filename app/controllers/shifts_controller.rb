@@ -1,5 +1,6 @@
 class ShiftsController < ApplicationController
-  before_action :find_organisation, :get_shifts
+  before_action :find_organisation, :get_shifts, except: %i[destroy]
+  before_action :find_shift, only: %i[update destroy]
 
   def index
     @shift = Shift.new
@@ -21,14 +22,42 @@ class ShiftsController < ApplicationController
     end
   end
 
+  def update
+    @shift_params = shift_params
+    @shift_params[:start] = DateTime.parse("#{@shift_params[:start_date]} #{@shift_params[:start_time]}")
+    if @shift_params[:start_time] > @shift_params[:finish]
+      @shift_params[:start_date] = (Date.parse(@shift_params[:start_date]) + 1).to_s
+      @shift_params[:finish] = DateTime.parse("#{@shift_params[:start_date]} #{@shift_params[:finish]}")
+    else
+      @shift_params[:finish] = DateTime.parse("#{@shift_params[:start_date]} #{@shift_params[:finish]}")
+    end
+    if @shift.update(@shift_params)
+      redirect_to shifts_path, notice: 'Shift was successfully created'
+    else
+      render :index
+    end
+  end
+
+  def destroy
+    if @shift.delete
+      redirect_to shifts_path, notice: 'Shift was successfully deleted'
+    else
+      redirect_to shifts_path, notice: 'Unable to delete shift'
+    end
+  end
+
   private
+
+  def find_shift
+    @shift = Shift.find(params[:id])
+  end
 
   def find_organisation
     @organisation = Organisation.find(current_user.organisation_id)
   end
 
   def get_shifts
-    @shifts = @organisation.shifts
+    @shifts = @organisation.shifts.order(start: :desc)
   end
 
   def shift_params
