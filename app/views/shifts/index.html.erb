@@ -1,6 +1,6 @@
 <h2><%= @organisation.name %></h2>
 <h3>Shifts</h3>
-<table>
+<table data-controller="shifts">
   <tbody>
     <tr>
       <th>Employee Name</th>
@@ -10,27 +10,43 @@
       <th>Break Length (minutes)</th>
       <th>Hours Worked</th>
       <th>Shift Cost</th>
+      <th></th>
     </tr>
     <% @shifts.each do |shift| %>
-      <tr>
+      <tr data-row-id="<%= shift.id %>">
         <td><%= shift.user.full_name %></td>
         <td><%= shift.start.strftime("%d/%m/%Y")%>
         <td><%= shift.start.strftime("%H:%M") %></td>
         <td><%= shift.finish.strftime("%H:%M") %></td>
         <td><%= shift.break %></td>
         <% @hours = (shift.finish - shift.start - (shift.break * 60)) / 3600 %>
-        <td><%= @hours %></td>
-        <td>£<%= @hours * @organisation.hourly_rate %></td>
+        <td><%= @hours.round(2) %></td>
+        <td>£<%= (@hours * @organisation.hourly_rate).round(2) %></td>
+        <td>
+          <%= link_to "Edit", shifts_path, data: { id: shift.id, action: "click->shifts#showForm" } %>
+          <%= link_to "Delete", shift, method: :delete %>
+        </td>
+      </tr>
+      <tr style="display: none;" data-form-id="<%= shift.id %>">
+        <%= form_for shift do |f| %>
+        <td><%= current_user.full_name %></td>
+        <td><%= f.date_field :start_date, form: "edit_shift_#{shift.id}", value: Date.parse(shift.start.to_s) %></td>
+        <td><%= f.time_field :start_time, form: "edit_shift_#{shift.id}", value: (Time.parse(shift.start.to_s)).strftime("%T.%L") %></td>
+        <td><%= f.time_field :finish, form: "edit_shift_#{shift.id}" %></td>
+        <td><%= f.number_field :break, step: 1, form: "edit_shift_#{shift.id}" %></td>
+        <td colspan="2"><%= f.submit form: "edit_shift_#{shift.id}" %></td>
+        <td><%= link_to "Cancel", shifts_path, data: { id: shift.id, action: "click->shifts#hideForm" } %></td>
+        <% end %>        
       </tr>
     <% end %>
     <tr>
       <%= form_for @shift do |f| %>
       <td><%= current_user.full_name %></td>
-      <td><%= f.date_field :start_date %></td>
-      <td><%= f.time_field :start_time %></td>
-      <td><%= f.time_field :finish %></td>
-      <td><%= f.number_field :break, step: 1 %></td>
-      <td colspan="2"><%= f.submit %></td>
+      <td><%= f.date_field :start_date, form: "new_shift" %></td>
+      <td><%= f.time_field :start_time, form: "new_shift" %></td>
+      <td><%= f.time_field :finish, form: "new_shift" %></td>
+      <td><%= f.number_field :break, step: 1, form: "new_shift" %></td>
+      <td colspan="3"><%= f.submit form: "new_shift" %></td>
       <% end %>
     </tr>
   </tbody>

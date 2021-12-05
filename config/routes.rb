@@ -6,5 +6,5 @@ Rails.application.routes.draw do
     patch "/join", to: "users#join"
   end
   patch "/leave", to: "users#leave", as: "organisation_leave"
-  resources :shifts, only: %i[index create]
+  resources :shifts, only: %i[index create update destroy]
 end
