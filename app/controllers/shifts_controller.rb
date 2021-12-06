@@ -4,6 +4,8 @@ class ShiftsController < ApplicationController
 
   def index
     @shift = Shift.new
+
+    # Date filter params
     if params[:start_date].present? || params[:finish_date].present?
       @start_date = params[:start_date].empty? ? "1970-01-01" : params[:start_date]
       @finish_date = params[:finish_date].empty? ? Date.today.strftime("%Y-%m-%d") : params[:finish_date]
@@ -11,12 +13,17 @@ class ShiftsController < ApplicationController
                   .where(start: @start_date..@finish_date)
                   .where(finish: @start_date..@finish_date)
     end
+
+    # Employee search params
     if params[:query].present?
       @shifts = @shifts.where(user: User.where('full_name ILIKE ?', "%#{params[:query]}%"))
     end
+
+    # Table sort params
     if params[:sort].present? && params[:order].present?
       @shifts = Shift.where(organisation: @organisation).order("#{params[:sort]} #{params[:order]}")
     end
+    
     respond_to do |format|
       format.html
       format.text { render partial: 'shifts.html', locals: { shifts: @shifts } }
@@ -66,13 +73,17 @@ class ShiftsController < ApplicationController
 
   def shift_params
     @shift_params = params.require(:shift).permit(:start_date, :start_time, :finish, :break)
+    
+    # Calculate start time from virtual attributes
     @shift_params[:start] = DateTime.parse("#{@shift_params[:start_date]} #{@shift_params[:start_time]}")
-    if @shift_params[:start_time] > @shift_params[:finish]
-      @shift_params[:start_date] = (Date.parse(@shift_params[:start_date]) + 1).to_s
-      @shift_params[:finish] = DateTime.parse("#{@shift_params[:start_date]} #{@shift_params[:finish]}")
+    
+    # Calculate overnight shift from virtual attributes
+    if @shift_params[:start_time] >= @shift_params[:finish]
+      @shift_params[:finish] = DateTime.parse("#{(Date.parse(@shift_params[:start_date]) + 1).to_s} #{@shift_params[:finish]}")
     else
       @shift_params[:finish] = DateTime.parse("#{@shift_params[:start_date]} #{@shift_params[:finish]}")
     end
-    return @shift_params
+    
+    @shift_params
   end
 end
