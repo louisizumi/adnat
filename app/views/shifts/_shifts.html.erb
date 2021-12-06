@@ -10,7 +10,7 @@
       <div class="td"><%= shift.finish.strftime("%H:%M") %></div>
       <div class="td"><%= shift.break %></div>
       <div class="td"><%= "%.2f" % shift.hours %></div>
-      <div class="td">£<%= "%.2f" % (shift.hours * @organisation.hourly_rate) %></div>
+      <div class="td">£<%= "%.2f" % ((shift.hours - shift.sunday_hours) * @organisation.hourly_rate + (shift.sunday_hours * @organisation.hourly_rate * 2)) %></div>
   <% if shift.user.organisation == shift.organisation %>
       <div class="td">
         <%= link_to "Edit", shifts_path, data: { id: shift.id, action: "click->shifts#showForm" } %>
