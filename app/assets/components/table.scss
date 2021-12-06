@@ -1,5 +1,7 @@
 .table {
   display: table;
+  border: 1px solid black;
+  width: 100%;
 }
 
 .tr {
@@ -8,9 +10,11 @@
 
 .th {
   display: table-cell;
+  border: 1px solid black;
   font-weight: bold;
 }
 
 .td {
   display: table-cell;
+  border: 1px solid black;
 }

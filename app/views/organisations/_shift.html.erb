@@ -1,0 +1,33 @@
+<% if employments.find_by(user: shift.user) %>
+  <div class="tr" data-current="false" data-rowid="<%= shift.id %>">
+<% else %>
+  <div class="tr" style="display:none;" data-current="true" data-rowid="<%= shift.id %>">
+<% end %>
+    <div class="td"><%= shift.user.full_name %></div>
+    <div class="td"><%= shift.start.strftime("%d/%m/%Y")%></div>
+    <div class="td"><%= shift.start.strftime("%H:%M") %></div>
+    <div class="td"><%= shift.finish.strftime("%H:%M") %></div>
+    <div class="td"><%= shift.break %></div>
+    <div class="td"><%= "%.2f" % shift.hours %></div>
+    <div class="td">£<%= "%.2f" % ((shift.hours - shift.sunday_hours) * @organisation.hourly_rate + (shift.sunday_hours * @organisation.hourly_rate * 2)) %></div>
+<% if employments.find_by(user: shift.user) %>
+    <div class="td">
+      <%= link_to "Edit", organisation_shifts_path(@organisation), data: { id: shift.id, action: "click->shifts#showForm" } %>
+      <%= link_to "Delete", shift, method: :delete %>
+    </div>
+  </div>
+  <%= form_for shift, html: { class: "tr", style: "display:none;", data: { formid: shift.id } } do |f| %>
+    <div class="td"><%= current_user.full_name %></div>
+    <div class="td"><%= f.date_field :start_date, form: "edit_shift_#{shift.id}", value: Date.parse(shift.start.to_s) %></div>
+    <div class="td"><%= f.time_field :start_time, form: "edit_shift_#{shift.id}", value: (Time.parse(shift.start.to_s)).strftime("%T.%L") %></div>
+    <div class="td"><%= f.time_field :finish, form: "edit_shift_#{shift.id}" %></div>
+    <div class="td"><%= f.number_field :break, step: 1, form: "edit_shift_#{shift.id}" %></div>
+    <div class="td"><%= f.submit form: "edit_shift_#{shift.id}", data: { action: "submit->shifts#updateShift" } %></div>
+    <div class="td"></div>
+    <div class="td"><%= link_to "Cancel", organisation_shifts_path(@organisation), data: { id: shift.id, action: "click->shifts#hideForm" } %></div>
+  <% end %>
+<% else %>
+    <div class="td">
+    </div>
+  </div>
+<% end %>

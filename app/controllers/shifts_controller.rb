@@ -7,17 +7,22 @@ class ShiftsController < ApplicationController
     @shift = Shift.new(shift_params)
     @shift.user = current_user
     @shift.organisation = @organisation
-    if @shift.save
-      redirect_to @organisation, notice: 'Shift was successfully created'
-    else
-      render :index
+    respond_to do |format|
+      if @shift.save
+        format.html { redirect_to @organisation, notice: 'Shift was successfully created' }
+        format.json
+      else
+        @shift = Organisation.all
+        format.html { render organisations_path }
+        format.json
+      end
     end
   end
 
   def update
     @organisation = @shift.organisation
     if @shift.update(shift_params)
-      redirect_to @organisation, notice: 'Shift was successfully created'
+      redirect_to @organisation, notice: 'Shift was successfully updated'
     else
       render :index
     end

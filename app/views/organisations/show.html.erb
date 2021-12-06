@@ -2,26 +2,36 @@
 <h3>Shifts</h3>
 <div data-controller="shifts">
 
-  <div>
-    <%= link_to "Current Employees", @organisation, data: { action: "click->shifts#showCurrent" } %>
-    <%= link_to "Previous Employees", @organisation, data: { action: "click->shifts#showPrevious" } %>
-  </div>
-
-  <div>
-    <p>Filter by date range: </p>
-    <%= form_tag @organisation, method: :get, id: "filter_shift", data: { shifts_target: "form" } do %>
-      <%= date_field_tag :start_date, params[:start_date], form: "filter_shift", data: { shifts_target: "startDate" } %>
-      <%= date_field_tag :finish_date, params[:finish_date], form: "filter_shift", data: { shifts_target: "finishDate" } %>
-      <%= button_tag "Filter Dates", type: "submit", form: "filter_shift", data: { action: "click->shifts#filterDate" } %>
-    <% end %>
-    <%= button_tag "Clear Date", data: { action: "click->shifts#clearDate" } %>
-  </div>
-
-  <div>
+  <div class="section">
     <p>Search for an employee: </p>
     <%= form_tag @organisation, method: :get, data: { shifts_target: "searchForm" } do %>
-      <%= text_field_tag :query, params[:query], placeholder: "Employee name", data: { action: "input->shifts#search", shifts_target: "input" } %>
+      <div class="field">
+        <%= text_field_tag :query, params[:query], placeholder: "Employee name", data: { action: "input->shifts#search", shifts_target: "input" } %>
+      </div>
     <% end %>
+  </div>
+
+  <div class="section">
+    <p>Filter by date range: </p>
+    <%= form_tag @organisation, method: :get, id: "filter_shift", data: { shifts_target: "form" } do %>
+      <div class="field">
+        <%= date_field_tag :start_date, params[:start_date], form: "filter_shift", data: { shifts_target: "startDate" } %>
+      </div>
+      <div class="field">
+        <%= date_field_tag :finish_date, params[:finish_date], form: "filter_shift", data: { shifts_target: "finishDate" } %>
+      </div>
+      <div class="actions">
+        <%= button_tag "Filter Dates", type: "submit", form: "filter_shift", data: { action: "click->shifts#filterDate" } %>
+      </div>
+    <% end %>
+    <div class="actions">
+      <%= button_tag "Clear Date", data: { action: "click->shifts#clearDate" } %>
+    </div>
+  </div>
+
+  <div class="section">
+    <%= link_to "Current Employees", @organisation, data: { action: "click->shifts#showCurrent" } %>
+    <%= link_to "Previous Employees", @organisation, data: { action: "click->shifts#showPrevious" } %>
   </div>
 
   <div class="table">
@@ -38,6 +48,16 @@
     <div style="display:contents;" data-show="current" data-shifts-target="table">
       <%= render "shifts", shifts: @shifts %>
     </div>
+    <%= form_for [@organisation, @shift], html: { class: "tr", data: { current: "false", shifts_target: "newForm" } } do |f| %>
+      <div class="td"><%= current_user.full_name %></div>
+      <div class="td"><%= f.date_field :start_date, form: "new_shift" %></div>
+      <div class="td"><%= f.time_field :start_time, form: "new_shift" %></div>
+      <div class="td"><%= f.time_field :finish, form: "new_shift" %></div>
+      <div class="td"><%= f.number_field :break, step: 1, form: "new_shift" %></div>
+      <div class="td"><%= f.submit form: "new_shift", data: { action: "submit->shifts#createShift"} %></div>
+      <div class="td"></div>
+      <div class="td"></div>
+    <% end %>
   </div>
 
 

@@ -1,7 +1,7 @@
 import { Controller } from "stimulus"
 
 export default class extends Controller {
-  static targets = [ "startDate", "finishDate", "searchForm", "input", "table" ]
+  static targets = [ "startDate", "finishDate", "searchForm", "input", "table", "newForm" ]
   
   showRows(value) {
     const currentShifts = document.querySelectorAll("[data-current='false']");
@@ -102,5 +102,40 @@ export default class extends Controller {
     const row = document.querySelector(`[data-rowid='${id}']`);
     const form = document.querySelector(`[data-formid='${id}']`);
     return [row, form];
+  }
+
+  createShift(e) {
+    e.preventDefault();
+    const url = `${this.newFormTarget.action}`
+    fetch(url, {
+      method: "POST",
+      headers: { 'Accept': "application/json", 'X-CSRF-Token': csrfToken() },
+      body: new FormData(this.newFormTarget)
+    })
+    .then(response => response.json())
+    .then((data) => {
+      this.tableTarget.insertAdjacentHTML("afterbegin", data.inserted_item);
+    })
+    .then(() => {
+      this.newFormTarget.reset();
+    })
+  }
+
+  updateShift(e) {
+    // e.preventDefault();
+    // console.log(e.target);
+    // const url = `${this.editFormTarget.action}`
+    // fetch(url, {
+    //   method: "PATCH",
+    //   headers: { 'Accept': "application/json", 'X-CSRF-Token': csrfToken() },
+    //   body: new FormData(this.editFormTarget)
+    // })
+    // .then(response => response.json())
+    // .then((data) => {
+    //   document.querySelector.insertAdjacentHTML("beforebegin", data.inserted_item);
+    // })
+    // .then(() => {
+    //   this.editFormTarget.reset();
+    // })
   }
 }
