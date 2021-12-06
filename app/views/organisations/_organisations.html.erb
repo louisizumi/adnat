@@ -1,0 +1,11 @@
+<% @employment = Employment.find_by(user: current_user, organisation: organisation) %>
+<li>
+  <%= organisation.name %> 
+  <%= link_to "Edit", edit_organisation_path(organisation) %> 
+  <% if @employment %>
+    <%= link_to "Shifts", organisation %>
+    <%= link_to "Leave", employment_path(@employment), method: :delete %>
+  <% else %>
+    <%= link_to "Join", organisation_employments_path(organisation), method: :post %>
+  <% end %>
+</li>

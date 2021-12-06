@@ -2,14 +2,46 @@ class OrganisationsController < ApplicationController
   before_action :find_organisation, only: %i[show edit update destroy]
 
   def index
-    redirect_to home_path if current_user.organisation
     @organisations = Organisation.all
     @organisation = Organisation.new
+  end
+
+  def show
+    @employments = Employment.where(organisation: @organisation)
+    @shifts = Shift.where(organisation: @organisation).order(start: :desc)
+    @shift = Shift.new
+
+    # Date filter params
+    if params[:start_date].present? || params[:finish_date].present?
+      @start_date = params[:start_date].empty? ? "1970-01-01" : params[:start_date]
+      @finish_date = params[:finish_date].empty? ? Date.today.strftime("%Y-%m-%d") : params[:finish_date]
+      @shifts = @shifts
+                  .where(start: @start_date..@finish_date)
+                  .where(finish: @start_date..@finish_date)
+    end
+
+    # Employee search params
+    if params[:query].present?
+      @shifts = @shifts.where(user: User.where('full_name ILIKE ?', "%#{params[:query]}%"))
+    end
+
+    # Table sort params
+    if params[:sort].present? && params[:order].present?
+      @shifts = Shift.where(organisation: @organisation).order("#{params[:sort]} #{params[:order]}")
+    end
+    
+    respond_to do |format|
+      format.html
+      format.text { render partial: 'shifts.html', locals: { shifts: @shifts } }
+    end
   end
 
   def create
     @organisation = Organisation.new(organisation_params)
     if @organisation.save
+      respond_to do |format|
+        format.text { render partial: 'organisations.html', locals: { organisation: @organisation } }
+      end
       redirect_to organisations_path, notice: 'Organisation was successfully created'
     else
       render :index
@@ -27,7 +59,10 @@ class OrganisationsController < ApplicationController
   end
 
   def destroy
-    User.where(organisation: @organisation).update_all(organisation_id: nil)
+    @employments = Employment.where(organisation: @organisation)
+    @employments.each { |employment| employment.destroy }
+    @shifts = Shift.where(organisation: @organisation)
+    @shifts.each { |shift| shift.destroy }
     if @organisation.delete
       redirect_to organisations_path, notice: 'Organisation was successfully deleted'
     else

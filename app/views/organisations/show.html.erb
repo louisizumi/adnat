@@ -3,13 +3,13 @@
 <div data-controller="shifts">
 
   <div>
-    <%= link_to "Current Employees", shifts_path, data: { action: "click->shifts#showCurrent" } %>
-    <%= link_to "Previous Employees", shifts_path, data: { action: "click->shifts#showPrevious" } %>
+    <%= link_to "Current Employees", @organisation, data: { action: "click->shifts#showCurrent" } %>
+    <%= link_to "Previous Employees", @organisation, data: { action: "click->shifts#showPrevious" } %>
   </div>
 
   <div>
     <p>Filter by date range: </p>
-    <%= form_tag shifts_path, method: :get, id: "filter_shift", data: { shifts_target: "form" } do %>
+    <%= form_tag @organisation, method: :get, id: "filter_shift", data: { shifts_target: "form" } do %>
       <%= date_field_tag :start_date, params[:start_date], form: "filter_shift", data: { shifts_target: "startDate" } %>
       <%= date_field_tag :finish_date, params[:finish_date], form: "filter_shift", data: { shifts_target: "finishDate" } %>
       <%= button_tag "Filter Dates", type: "submit", form: "filter_shift", data: { action: "click->shifts#filterDate" } %>
@@ -19,7 +19,7 @@
 
   <div>
     <p>Search for an employee: </p>
-    <%= form_tag shifts_path, method: :get, data: { shifts_target: "searchForm" } do %>
+    <%= form_tag @organisation, method: :get, data: { shifts_target: "searchForm" } do %>
       <%= text_field_tag :query, params[:query], placeholder: "Employee name", data: { action: "input->shifts#search", shifts_target: "input" } %>
     <% end %>
   </div>
@@ -27,10 +27,10 @@
   <div class="table">
     <div class="tr">
       <div class="th">Employee Name</div>
-      <div class="th"><%= link_to "Start Date", shifts_path, data: { sort: "start", order: "ASC", action: "click->shifts#sortColumn" } %></div>
-      <div class="th"><%= link_to "Start Time", shifts_path, data: { sort: "start", order: "ASC", action: "click->shifts#sortColumn" } %></div>
-      <div class="th"><%= link_to "Finish Time", shifts_path, data: { sort: "finish", order: "ASC", action: "click->shifts#sortColumn" } %></div>
-      <div class="th"><%= link_to "Break Length (minutes)", shifts_path, data: { sort: "break", order: "ASC", action: "click->shifts#sortColumn" } %></div>
+      <div class="th"><%= link_to "Start Date", @organisation, data: { sort: "start", order: "ASC", action: "click->shifts#sortColumn" } %></div>
+      <div class="th"><%= link_to "Start Time", @organisation, data: { sort: "start", order: "ASC", action: "click->shifts#sortColumn" } %></div>
+      <div class="th"><%= link_to "Finish Time", @organisation, data: { sort: "finish", order: "ASC", action: "click->shifts#sortColumn" } %></div>
+      <div class="th"><%= link_to "Break Length (minutes)", @organisation, data: { sort: "break", order: "ASC", action: "click->shifts#sortColumn" } %></div>
       <div class="th">Hours Worked</div>
       <div class="th">Shift Cost</div>
       <div class="th"></div>
