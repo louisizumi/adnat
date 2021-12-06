@@ -12,15 +12,15 @@ class Shift < ApplicationRecord
   end
 
   def sunday_hours
-    if self.start.wday == 6
-      @sunday_hours = self.start - self.finish.midnight
-      if @sunday_hours >= 0
-        self.hours
-      else
-        @sunday_hours / 3600
-      end
+    @finish_without_break = Time.parse(self.finish.to_s) - (self.break * 60)
+    if self.start.wday == 0 && @finish_without_break.wday == 0
+      return self.hours
+    elsif self.start.wday == 0 && @finish_without_break.wday == 1
+      return (@finish_without_break - self.start.end_of_day) / 3600
+    elsif self.start.wday == 6 && @finish_without_break.wday == 0
+      return (@finish_without_break.midnight - self.start) / 3600
     else
-      0
+      return 0
     end
   end
 end
