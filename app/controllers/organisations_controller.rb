@@ -38,13 +38,15 @@ class OrganisationsController < ApplicationController
 
   def create
     @organisation = Organisation.new(organisation_params)
-    if @organisation.save
-      respond_to do |format|
-        format.text { render partial: 'organisations.html', locals: { organisation: @organisation } }
+    respond_to do |format|
+      if @organisation.save
+        format.html { redirect_to organisations_path, notice: 'Organisation was successfully created' }
+        format.json
+      else
+        @organisations = Organisation.all
+        format.html { render :index }
+        format.json
       end
-      redirect_to organisations_path, notice: 'Organisation was successfully created'
-    else
-      render :index
     end
   end
 
