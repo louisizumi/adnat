@@ -25,12 +25,6 @@ class ShiftsController < ApplicationController
 
   def create
     @shift = Shift.new(shift_params)
-    @shift.start = DateTime.parse("#{@shift.start_date} #{@shift.start_time}")
-    if @shift.start_time > @shift.finish
-      @shift.finish = DateTime.parse("#{@shift.start_date + 1} #{@shift.finish}")
-    else
-      @shift.finish = DateTime.parse("#{@shift.start_date} #{@shift.finish}")
-    end
     @shift.user = current_user
     @shift.organisation = @organisation
     if @shift.save
@@ -41,15 +35,7 @@ class ShiftsController < ApplicationController
   end
 
   def update
-    @shift_params = shift_params
-    @shift_params[:start] = DateTime.parse("#{@shift_params[:start_date]} #{@shift_params[:start_time]}")
-    if @shift_params[:start_time] > @shift_params[:finish]
-      @shift_params[:start_date] = (Date.parse(@shift_params[:start_date]) + 1).to_s
-      @shift_params[:finish] = DateTime.parse("#{@shift_params[:start_date]} #{@shift_params[:finish]}")
-    else
-      @shift_params[:finish] = DateTime.parse("#{@shift_params[:start_date]} #{@shift_params[:finish]}")
-    end
-    if @shift.update(@shift_params)
+    if @shift.update(shift_params)
       redirect_to shifts_path, notice: 'Shift was successfully created'
     else
       render :index
@@ -79,6 +65,14 @@ class ShiftsController < ApplicationController
   end
 
   def shift_params
-    params.require(:shift).permit(:start_date, :start_time, :finish, :break)
+    @shift_params = params.require(:shift).permit(:start_date, :start_time, :finish, :break)
+    @shift_params[:start] = DateTime.parse("#{@shift_params[:start_date]} #{@shift_params[:start_time]}")
+    if @shift_params[:start_time] > @shift_params[:finish]
+      @shift_params[:start_date] = (Date.parse(@shift_params[:start_date]) + 1).to_s
+      @shift_params[:finish] = DateTime.parse("#{@shift_params[:start_date]} #{@shift_params[:finish]}")
+    else
+      @shift_params[:finish] = DateTime.parse("#{@shift_params[:start_date]} #{@shift_params[:finish]}")
+    end
+    return @shift_params
   end
 end
