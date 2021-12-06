@@ -1,10 +1,11 @@
 Rails.application.routes.draw do
   # For details on the DSL available within this file, see https://guides.rubyonrails.org/routing.html
-  root to: "pages#home", as: "home"
+  root to: "organisations#index"
   devise_for :users
   resources :organisations, except: %i[new] do
-    patch "/join", to: "users#join"
+    resources :employments, only: %i[create]
+    resources :shifts, only: %i[create]
   end
-  patch "/leave", to: "users#leave", as: "organisation_leave"
-  resources :shifts, only: %i[index create update destroy]
+  resources :employments, only: %i[destroy]
+  resources :shifts, only: %i[update destroy]
 end
