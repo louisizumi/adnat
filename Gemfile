@@ -25,6 +25,8 @@ gem 'jbuilder', '~> 2.7'
 gem 'devise'
 # Turbolinks
 gem 'turbolinks_render'
+# Faker
+gem 'faker'
 
 # Use Active Storage variant
 # gem 'image_processing', '~> 1.2'
