@@ -4,6 +4,23 @@ class ShiftsController < ApplicationController
 
   def index
     @shift = Shift.new
+    if params[:start_date].present? || params[:finish_date].present?
+      @start_date = params[:start_date].empty? ? "1970-01-01" : params[:start_date]
+      @finish_date = params[:finish_date].empty? ? Date.today.strftime("%Y-%m-%d") : params[:finish_date]
+      @shifts = @shifts
+                  .where(start: @start_date..@finish_date)
+                  .where(finish: @start_date..@finish_date)
+    end
+    if params[:query].present?
+      @shifts = @shifts.where(user: User.where('full_name ILIKE ?', "%#{params[:query]}%"))
+    end
+    if params[:sort].present? && params[:order].present?
+      @shifts = Shift.where(organisation: @organisation).order("#{params[:sort]} #{params[:order]}")
+    end
+    respond_to do |format|
+      format.html
+      format.text { render partial: 'shifts.html', locals: { shifts: @shifts } }
+    end
   end
 
   def create
@@ -59,8 +76,6 @@ class ShiftsController < ApplicationController
 
   def get_shifts
     @shifts = Shift.where(organisation: @organisation).order(start: :desc)
-    @current_shifts = @shifts.select { |shift| shift.user.organisation == shift.organisation }
-    @previous_shifts = @shifts.reject { |shift| shift.user.organisation == shift.organisation }
   end
 
   def shift_params

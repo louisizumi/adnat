@@ -12,6 +12,9 @@
 
 ActiveRecord::Schema.define(version: 2021_12_05_135740) do
 
+  # These are extensions that must be enabled in order to support this database
+  enable_extension "plpgsql"
+
   create_table "organisations", force: :cascade do |t|
     t.string "name"
     t.float "hourly_rate"
@@ -20,13 +23,13 @@ ActiveRecord::Schema.define(version: 2021_12_05_135740) do
   end
 
   create_table "shifts", force: :cascade do |t|
-    t.integer "user_id", null: false
+    t.bigint "user_id", null: false
     t.datetime "start"
     t.datetime "finish"
     t.integer "break"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.integer "organisation_id"
+    t.bigint "organisation_id"
     t.index ["organisation_id"], name: "index_shifts_on_organisation_id"
     t.index ["user_id"], name: "index_shifts_on_user_id"
   end
@@ -40,7 +43,7 @@ ActiveRecord::Schema.define(version: 2021_12_05_135740) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.string "full_name"
-    t.integer "organisation_id"
+    t.bigint "organisation_id"
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["organisation_id"], name: "index_users_on_organisation_id"
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true

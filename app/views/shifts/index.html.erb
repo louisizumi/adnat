@@ -1,82 +1,44 @@
 <h2><%= @organisation.name %></h2>
 <h3>Shifts</h3>
 <div data-controller="shifts">
-  <p>
+
+  <div>
     <%= link_to "Current Employees", shifts_path, data: { action: "click->shifts#showCurrent" } %>
     <%= link_to "Previous Employees", shifts_path, data: { action: "click->shifts#showPrevious" } %>
-  </p>
-  <div class="table" data-shifts-target="currentShifts">
-    <div class="tr">
-      <div class="th">Employee Name</div>
-      <div class="th">Start Date</div>
-      <div class="th">Start Time</div>
-      <div class="th">Finish Time</div>
-      <div class="th">Break Length (minutes)</div>
-      <div class="th">Hours Worked</div>
-      <div class="th">Shift Cost</div>
-      <div class="th"></div>
-    </div>
-    <% @current_shifts.each do |shift| %>
-      <div class="tr" data-rowid="<%= shift.id %>">
-        <div class="td"><%= shift.user.full_name %></div>
-        <div class="td"><%= shift.start.strftime("%d/%m/%Y")%></div>
-        <div class="td"><%= shift.start.strftime("%H:%M") %></div>
-        <div class="td"><%= shift.finish.strftime("%H:%M") %></div>
-        <div class="td"><%= shift.break %></div>
-        <% @hours = (shift.finish - shift.start - (shift.break * 60)) / 3600 %>
-        <div class="td"><%= "%.2f" % @hours %></div>
-        <div class="td">£<%= "%.2f" % (@hours * @organisation.hourly_rate) %></div>
-        <div class="td">
-          <%= link_to "Edit", shifts_path, data: { id: shift.id, action: "click->shifts#showForm" } %>
-          <%= link_to "Delete", shift, method: :delete %>
-        </div>
-      </div>
-      <%= form_for shift, html: { class: "tr", style: "display:none;", data: { formid: shift.id } } do |f| %>
-        <div class="td"><%= current_user.full_name %></div>
-        <div class="td"><%= f.date_field :start_date, form: "edit_shift_#{shift.id}", value: Date.parse(shift.start.to_s) %></div>
-        <div class="td"><%= f.time_field :start_time, form: "edit_shift_#{shift.id}", value: (Time.parse(shift.start.to_s)).strftime("%T.%L") %></div>
-        <div class="td"><%= f.time_field :finish, form: "edit_shift_#{shift.id}" %></div>
-        <div class="td"><%= f.number_field :break, step: 1, form: "edit_shift_#{shift.id}" %></div>
-        <div class="td" colspan="2"><%= f.submit form: "edit_shift_#{shift.id}" %></div>
-        <div class="td"><%= link_to "Cancel", shifts_path, data: { id: shift.id, action: "click->shifts#hideForm" } %></div>
-      <% end %>  
+  </div>
+
+  <div>
+    <p>Filter by date range: </p>
+    <%= form_tag shifts_path, method: :get, id: "filter_shift", data: { shifts_target: "form" } do %>
+      <%= date_field_tag :start_date, params[:start_date], form: "filter_shift", data: { shifts_target: "startDate" } %>
+      <%= date_field_tag :finish_date, params[:finish_date], form: "filter_shift", data: { shifts_target: "finishDate" } %>
+      <%= button_tag "Filter Dates", type: "submit", form: "filter_shift", data: { action: "click->shifts#filterDate" } %>
     <% end %>
-    <%= form_for @shift, html: { class: "tr" } do |f| %>
-      <div class="td"><%= current_user.full_name %></div>
-      <div class="td"><%= f.date_field :start_date, form: "new_shift" %></div>
-      <div class="td"><%= f.time_field :start_time, form: "new_shift" %></div>
-      <div class="td"><%= f.time_field :finish, form: "new_shift" %></div>
-      <div class="td"><%= f.number_field :break, step: 1, form: "new_shift" %></div>
-      <div class="td" colspan="3"><%= f.submit form: "new_shift" %></div>
+    <%= button_tag "Clear Date", data: { action: "click->shifts#clearDate" } %>
+  </div>
+
+  <div>
+    <p>Search for an employee: </p>
+    <%= form_tag shifts_path, method: :get, data: { shifts_target: "searchForm" } do %>
+      <%= text_field_tag :query, params[:query], placeholder: "Employee name", data: { action: "input->shifts#search", shifts_target: "input" } %>
     <% end %>
   </div>
 
-  <div class="table" style="display:none;" data-shifts-target="previousShifts">
+  <div class="table">
     <div class="tr">
       <div class="th">Employee Name</div>
-      <div class="th">Start Date</div>
-      <div class="th">Start Time</div>
-      <div class="th">Finish Time</div>
-      <div class="th">Break Length (minutes)</div>
+      <div class="th"><%= link_to "Start Date", shifts_path, data: { sort: "start", order: "ASC", action: "click->shifts#sortColumn" } %></div>
+      <div class="th"><%= link_to "Start Time", shifts_path, data: { sort: "start", order: "ASC", action: "click->shifts#sortColumn" } %></div>
+      <div class="th"><%= link_to "Finish Time", shifts_path, data: { sort: "finish", order: "ASC", action: "click->shifts#sortColumn" } %></div>
+      <div class="th"><%= link_to "Break Length (minutes)", shifts_path, data: { sort: "break", order: "ASC", action: "click->shifts#sortColumn" } %></div>
       <div class="th">Hours Worked</div>
       <div class="th">Shift Cost</div>
       <div class="th"></div>
     </div>
-    <% @previous_shifts.each do |shift| %>
-      <div class="tr" data-rowid="<%= shift.id %>">
-        <div class="td"><%= shift.user.full_name %></div>
-        <div class="td"><%= shift.start.strftime("%d/%m/%Y")%></div>
-        <div class="td"><%= shift.start.strftime("%H:%M") %></div>
-        <div class="td"><%= shift.finish.strftime("%H:%M") %></div>
-        <div class="td"><%= shift.break %></div>
-        <% @hours = (shift.finish - shift.start - (shift.break * 60)) / 3600 %>
-        <div class="td"><%= "%.2f" % @hours %></div>
-        <div class="td">£<%= "%.2f" % (@hours * @organisation.hourly_rate) %></div>
-        <div class="td">
-          <%= link_to "Edit", shifts_path, data: { id: shift.id, action: "click->shifts#showForm" } %>
-          <%= link_to "Delete", shift, method: :delete %>
-        </div>
-      </div>
-    <% end %>
+    <div style="display:contents;" data-show="current" data-shifts-target="table">
+      <%= render "shifts", shifts: @shifts %>
+    </div>
   </div>
+
+
 </div>
